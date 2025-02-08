@@ -8,7 +8,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 
-
+/**
+ * Класс для работы со страницей оформления заказа.
+ * Содержит методы для заполнения форм и взаимодействия с элементами страницы.
+ */
 public class OrderPage {
     private WebDriver driver;
     // Явное ожидание с таймаутом 10 секунд
@@ -52,14 +55,22 @@ public class OrderPage {
     // Кнопка "Заказать" (на второй форме)
     private By orderButton = By.xpath("//*[@id=\"root\"]/div/div[2]/div[3]/button[2]");
 
+    // ******************** МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ЗАКАЗА ********************
+    // Кнопка "Да" в модальном окне с сообщением "Хотите оформить заказ?"
+    private By confirmOrderButton = By.xpath("//*[@id=\"root\"]/div/div[2]/div[5]/div[2]/button[2]");
 
+    /**
+     * Конструктор страницы оформления заказа.
+     */
     public OrderPage(WebDriver driver) {
         this.driver = driver;
         // Инициализируем WebDriverWait с таймаутом 10 секунд
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-
+    /**
+     * Метод для заполнения первой формы заказа (личные данные).
+     */
     public void fillOrderFormStepOne(String firstName, String lastName, String address, String metroStation, String phone) {
         // Вводим имя
         driver.findElement(firstNameField).sendKeys(firstName);
@@ -91,12 +102,16 @@ public class OrderPage {
         driver.findElement(phoneField).sendKeys(phone);
     }
 
-
+    /**
+     * Метод для нажатия кнопки "Далее" на первой форме.
+     */
     public void clickNextButton() {
         wait.until(ExpectedConditions.elementToBeClickable(nextButton)).click();
     }
 
-
+    /**
+     * Метод для заполнения второй формы заказа (данные заказа).
+     */
     public void fillOrderFormStepTwo(String deliveryDate, String rentalPeriod, String scooterColor, String comment) {
         // Вводим дату доставки
         WebElement deliveryField = driver.findElement(deliveryDateField);
@@ -117,7 +132,9 @@ public class OrderPage {
         driver.findElement(commentField).sendKeys(comment);
     }
 
-
+    /**
+     * Метод для выбора цвета самоката через чекбоксы.
+     */
     public void selectScooterColor(String color) {
         if (color.equalsIgnoreCase("чёрный жемчуг")) {
             wait.until(ExpectedConditions.elementToBeClickable(blackCheckbox)).click();
@@ -126,18 +143,26 @@ public class OrderPage {
         }
     }
 
-
+    /**
+     * Метод для нажатия кнопки "Заказать" на второй форме, а затем для подтверждения заказа в модальном окне.
+     */
     public void clickOrderButton() {
         wait.until(ExpectedConditions.elementToBeClickable(orderButton)).click();
+        // Ожидаем появления модального окна и нажимаем кнопку "Да"
+        wait.until(ExpectedConditions.elementToBeClickable(confirmOrderButton)).click();
     }
 
-
+    /**
+     * Метод для проверки отображения сообщения об успешном оформлении заказа.
+     */
     public boolean isOrderSuccessMessageDisplayed() {
         try {
-            // Ожидаем появления элемента с текстом, подтверждающим оформление заказа
-            By successMessageLocator = By.xpath("//*[contains(text(),'Хотите оформить заказ?')]");
+            // Ожидаем появления элемента с текстом "Заказ оформлен"
+            By successMessageLocator = By.xpath("//*[contains(text(),'Заказ оформлен')]");
             WebElement successMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(successMessageLocator));
-            return successMessage.isDisplayed();
+            String messageText = successMessage.getText();
+            // Проверяем, что текст содержит "Заказ оформлен" и "Номер заказа:" (номер заказа может быть любым)
+            return messageText.contains("Заказ оформлен") && messageText.contains("Номер заказа:");
         } catch (Exception e) {
             return false;
         }
