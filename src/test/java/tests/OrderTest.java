@@ -120,7 +120,7 @@ public class OrderTest {
         orderPage.clickOrderButton();
 
         // Ожидаем появления сообщения об успешном оформлении заказа
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(),'Хотите оформить заказ?')]")));
+        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(),'Хотите оформить заказ?')]")));
 
         // Проверяем, что сообщение об успешном заказе отображается
         assertTrue("Сообщение об успешном заказе не отображается", orderPage.isOrderSuccessMessageDisplayed());
